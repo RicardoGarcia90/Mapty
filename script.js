@@ -13,11 +13,11 @@ class Workout {
 
   _setDrescription() {
     // prettier-ignore
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
 
     this.drescription = `${this.type[0].toUpperCase()}${this.type.slice(
       1
-    )} on ${months[this.date.getMonth()]} ${this.date.getDate()}`;
+    )} em ${this.date.getDate()} de ${months[this.date.getMonth()]}`;
   }
 
   click() {
@@ -26,7 +26,7 @@ class Workout {
 }
 
 class Running extends Workout {
-  type = 'running';
+  type = 'Corrida';
 
   constructor(coords, distance, duration, cadence) {
     super(coords, distance, duration);
@@ -43,7 +43,7 @@ class Running extends Workout {
 }
 
 class Cycling extends Workout {
-  type = 'cycling';
+  type = 'Ciclismo';
 
   constructor(coords, distance, duration, elevationGain) {
     super(coords, distance, duration);
@@ -93,7 +93,7 @@ class App {
       navigator.geolocation.getCurrentPosition(
         this._loadMap.bind(this),
         function () {
-          alert('Could not get your position');
+          alert('Não foi possível obter sua posição');
         }
       );
   }
@@ -104,14 +104,13 @@ class App {
 
     const coords = [latitude, longitude];
 
-    this.#map = L.map('map').setView(coords, this.#mapZoomLevel); // Esse 13 é o zoom do mapa quando abre
+    this.#map = L.map('map').setView(coords, this.#mapZoomLevel);
 
     L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
       attribution:
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(this.#map);
 
-    // Handling clicks on map
     this.#map.on('click', this._showForm.bind(this));
 
     this.#workouts.forEach(work => {
@@ -123,6 +122,9 @@ class App {
     this.#mapEvent = mapE;
     form.classList.remove('hidden');
     inputDistance.focus();
+
+    document.querySelector('.text-title').textContent =
+      'Após preencher pressione Enter';
   }
 
   _hideForm() {
@@ -135,6 +137,8 @@ class App {
 
     form.style.display = 'none';
     form.classList.add('hidden');
+    document.querySelector('.text-title').textContent =
+      'Clique no mapa sua localização atual';
     setTimeout(() => (form.style.display = 'grid'), 1000);
   }
 
@@ -153,7 +157,7 @@ class App {
 
     // Get data from form
     const type = inputType.value;
-    const distance = +inputDistance.value; // + na frente converte em númrero
+    const distance = +inputDistance.value;
     const duration = +inputDuration.value;
     const { lat, lng } = this.#mapEvent.latlng;
     let workout;
@@ -163,13 +167,10 @@ class App {
       const cadence = +inputCadence.value;
       // Check if data is valid
       if (
-        // !Number.isFinite(distance) ||
-        // !Number.isFinite(duration) ||
-        // !Number.isFinite(cadence)
         !validInputs(distance, duration, cadence) ||
         !allPositive(distance, duration, cadence)
       )
-        return alert('Inputs have to be positive numbers!');
+        return alert('As entradas devem ser números positivos!');
 
       workout = new Running([lat, lng], distance, duration, cadence);
     }
@@ -182,7 +183,7 @@ class App {
         !validInputs(distance, duration, elevation) ||
         !allPositive(distance, duration)
       )
-        return alert('Inputs have to be positive numbers!');
+        return alert('As entradas devem ser números positivos!');
 
       workout = new Cycling([lat, lng], distance, duration, elevation);
     }
@@ -287,9 +288,6 @@ class App {
         duration: 1,
       },
     });
-
-    // using the public interface
-    // workout.click();
   }
 
   _setLocalStorage() {
